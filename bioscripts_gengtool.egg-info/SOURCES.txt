@@ -1,0 +1,13 @@
+README.txt
+setup.py
+bioscripts/__init__.py
+bioscripts/gengtool/__init__.py
+bioscripts/gengtool/ui.py
+bioscripts_gengtool.egg-info/PKG-INFO
+bioscripts_gengtool.egg-info/SOURCES.txt
+bioscripts_gengtool.egg-info/dependency_links.txt
+bioscripts_gengtool.egg-info/entry_points.txt
+bioscripts_gengtool.egg-info/namespace_packages.txt
+bioscripts_gengtool.egg-info/not-zip-safe
+bioscripts_gengtool.egg-info/requires.txt
+bioscripts_gengtool.egg-info/top_level.txt
