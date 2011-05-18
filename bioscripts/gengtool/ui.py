@@ -1,12 +1,19 @@
 """
 Various user-interface routines.
 
+These provide a simple, consistent and robust way of gathering information from
+a commandline user. Users are prompted with a question and optionally
+explanatory help text and hints of possible answers.
+
 A question is formatted as follows::
 
 	helptext helptext helptext helptext
 	helptext helptext helptext helptext
 	helptext
-	question [hints or choices]:
+	long choices
+	long choices
+	long choices
+	question [hints]:
 
 """
 
@@ -46,6 +53,15 @@ def _clean_text (text):
 	return SPACE_RE.sub (' ', text.strip())
 	
 
+def _format_hints_text (hints, default=None):
+	if hints:
+		hint_str = ''.join(hints)
+		if default is not None:
+			hint_str = "%s, default %s" % (hint_str, default)
+		return " [%s]" % hint_str
+	else:
+		return ""
+
 
 ### CONVERTERS
 
@@ -55,9 +71,20 @@ class Converter (object):
 	
 	Should throw an error if any problems.
 	"""
-	
 	def __call__ (self, value):
-		assert False, "must override in subclass"
+		# NOTE: override in subclass
+		value = self.convert(value)
+		self.validate (value)
+		return value
+	
+	def validate (self, value):
+		# NOTE: override in subclass
+		# probably a series of assertions
+		pass
+	
+	def convert (self, value):
+		# NOTE: override in subclass
+		return value
 		
 		
 class Clean (Converter):
@@ -92,9 +119,14 @@ class Vocab (Converter):
 		self._allowed_values = args
 		
 	def __call__ (self, value):
-		assert value in self._allowed_values, "'%s' is not an allowed value" % value
+		assert value in self._allowed_values, "I don't understand '%s'." % value
 		return value
 
+class Nonblank (Converter):
+	def validate (self, value):
+		assert 0 < len(value), "can't be a blank string"
+		return value
+	
 
 ### USER QUESTION FUNCTIONS
 
@@ -132,27 +164,24 @@ def ask (question, converters=[], help=None, hints=None, default='',
 	## Main:
 	# show leadin
 	if help:
-		print "%s\n" % _clean_text(help)
+		print "%s" % help
 	# build presentation
-	if hints:
-		hint_str = " [%s]" % hints
-	else:
-		hint_str = ""
-	question_str = _clean_text ("%s%s: " % (question, hint_str))
+	question_str = _clean_text ("%s%s: " % (question, _format_hints_text (hints, default)))
 	# ask question until you get a valid answer
 	while True:
 		print question_str,
 		raw_answer = raw_input().strip()
 		if strip_flanking_space:
 			raw_answer = raw_answer.strip()
-		raw_answer = raw_answer or default
+		if default:
+			raw_answer = raw_answer or default
 		try:
 			for conv in converters:
 				raw_answer = conv.__call__ (raw_answer)
 		except StandardError, err:
-			print "A problem: %s!" % err
+			print "A problem: %s Try again ..." % err
 		except:
-			print "A problem: unknown error!"
+			print "A problem: unknown error. Try again ..."
 		else:
 			return raw_answer
 
@@ -191,35 +220,72 @@ def ask_yesno (question, help=None, default=None):
 		default=default,
 	)
 
-
-def ask_long_choice (question, choices, converters=[], help=None, default=None):
+# :Parameters:
+#    choices
+#        An array of Choices, or raw strings
+#
+# Users can select a value by typing in the value or selecting a number.
+#
+def ask_long_choice (question, choices, help=None, default=None):
 	"""
 	Ask the user to make a choice from a list
+	
+	:Parameters:
+		
 	"""
 	## Preconditions:
-	choice_str = choice_str.strip().lower()
-	assert choice_str, "need choices for question"
+	assert choices, "need choices for question"
 	if default:
 		default = default.lower()
-		assert (len(default) == 1), \
-		"ask_short_choice uses only single letters, not '%s'" % default
 	## Main:
-	if default:
-		hints = "%s, default %s" % (choice_str, default)
-	else:
-		hints = choice_str
+	# build choices list
+	synonyms = {}
+	vocab = []
+	menu = []
+	for i, c in enumerate (choices):
+		if isinstance (c, basestring):
+			val = c
+			desc = c
+			syns = []
+		elif instance_of (c, Choice):
+			val = c.value
+			desc = c.desc or value
+			syns = c.syns
+		else:
+			assert false, "shouldn't get here"
+		assert val not in vocab, "duplicate choice value '%s'" % val
+		vocab.append (val)
+		menu_index = str(i + 1)
+		syns.append(menu_index)
+		for s in syns:
+			assert not synonyms.has_key(s), "duplicate choice synonym '%s'" % s
+			synonyms[s] = val
+		menu.append ("   %s. %s" % (menu_index, desc))
+	help = '\n'.join([help]+ menu).strip()
+
 	## Postconditions & return:
 	return ask (question,
-		converters= converters or [Vocab(list(choice_str))],
-		help=help, hints=hints, default=default)
+		converters=[
+			Synonyms(synonyms),
+			Vocab(vocab)
+		],
+		help=help,
+		hints='1-%s' % len(choices),
+		default=default)
 	
 
 
+def ask_string (question, converters=[], help=None, hints=None, default=None,
+		strip_flanking_space=True, allow_blank=False):
+	return ask (question, converters=converters+[Nonblank()], help=help,
+		hints=hints, default=default, strip_flanking_space=True):
+
+
 class Choice (object):
-	def __init__ (self, value, help=None, shortcut=None):
+	def __init__ (self, value, description=None, synonyms=[]):
 		self.value = value
-		self.help = help
-		self.shortcut = shortcut
+		self.desc = description
+		self.synonyms = synonyms
 
 	
 	
