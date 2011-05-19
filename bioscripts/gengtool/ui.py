@@ -164,7 +164,10 @@ def ask (question, converters=[], help=None, hints=None, default='',
 	## Main:
 	# show leadin
 	if help:
-		print "%s" % help
+		if isinstance (help, basestring):
+			help = [help]
+		for h in help:
+			print help
 	# build presentation
 	question_str = _clean_text ("%s%s: " % (question, _format_hints_text (hints, default)))
 	# ask question until you get a valid answer
@@ -271,8 +274,8 @@ def ask_long_choice (question, choices, help=None, default=None):
 		],
 		help=help,
 		hints='1-%s' % len(choices),
-		default=default)
-	
+		default=default
+	)
 
 
 def ask_string (question, converters=[], help=None, hints=None, default=None,

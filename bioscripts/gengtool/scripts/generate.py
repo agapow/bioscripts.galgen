@@ -69,25 +69,44 @@ def ask_tool_information (options):
 		allow_blank=True,
 	)
 	options.tool_help = ask_string ("What is the tool's help text",
-		help="""Extended help text cmay be supplied, but is probably best editted
-			in later.""",
+		help="""Extended help text may be supplied in restructured text format.""",
 		allow_blank=True,
 	)
+	
 	
 def ask_commandline_form (options):
 	print_section ("Commandline details"):
 	options.tool_help = ask_string ("What is the form of the command-line",
-		help="""How is the commandline tool .""",
+		help="""How is the wrapped commandline executable called? Choose one of
+			the below options, or manually enter one, using either the abstract
+			notation or an actual commandline. The abstract """,
+		choices=[
+			'exe option* infile > outfile',
+			'exe option* infile outfile',
+			'exe option* infile > outfile',
+			'exe option* infile > outfile',
+			
+		],
+		default=1,
 	)
 	pass
 
 def ask_generation_details (options):
-	ask_yesno ("Is the executable internal", default='y',
-		help="Tools can call executables that are internal to the package (i.e.
-			contained inside or external"
+	ask_yesno ("Is the executable internal",
+		default='y',
+		help="""Tools can call executables that are internal (i.e. packaged
+			inside the tool directory) or external (i.e. present elsewhere on the
+			system)""",
 	)
-
-
+	ask_string ("Name the tool-conf.xml entry fragment",
+		default=
+	)
+	ask_string ("Name the tool folder",
+		default=
+	)
+	ask_string ("Name the config file",
+		default=
+	)
 
 
 ### MAIN ###
