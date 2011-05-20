@@ -3,7 +3,7 @@ Introduction
 
 Writing tool template files for Galaxy can sometimes be extended and error-prone
 process, especially if you're not a programmer or inexperienced in XML and
-templating systems. *bioscripts.gengtool* is a Python library that packages a
+templating systems. *bioscripts.galgen* is a Python library that packages a
 script for generating the files that Galaxy requires to wrap a commandline tool
 from a series of interactive questions. For simple tools, these files should be
 complete and ready for use. For more complex tools, they will serve as a useful
@@ -20,7 +20,7 @@ Tool generation overview
 The tool generation script is called ``gene-gtool`` and can be called from the
 commandline as such::
 
-	% gen-gtool
+	% galgen
 
 Commandline options are available, see below.
 

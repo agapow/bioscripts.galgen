@@ -16,8 +16,8 @@ from os import path
 from optparse import OptionParser
 from exceptions import BaseException
 
-from bioscripts.gengtools import __version__
-from bioscripts.gengtools import ui
+from bioscripts.galgen import __version__
+from bioscripts.galgen import ui
 
 
 ### CONSTANTS & DEFINES ###

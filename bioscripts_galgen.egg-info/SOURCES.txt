@@ -1,0 +1,13 @@
+README.txt
+setup.py
+bioscripts/__init__.py
+bioscripts/galgen/__init__.py
+bioscripts/galgen/ui.py
+bioscripts_galgen.egg-info/PKG-INFO
+bioscripts_galgen.egg-info/SOURCES.txt
+bioscripts_galgen.egg-info/dependency_links.txt
+bioscripts_galgen.egg-info/entry_points.txt
+bioscripts_galgen.egg-info/namespace_packages.txt
+bioscripts_galgen.egg-info/not-zip-safe
+bioscripts_galgen.egg-info/requires.txt
+bioscripts_galgen.egg-info/top_level.txt

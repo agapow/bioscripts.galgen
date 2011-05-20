@@ -1,5 +1,5 @@
 Metadata-Version: 1.0
-Name: bioscripts-gengtool
+Name: bioscripts-galgen
 Version: 0.1
 Summary: Script for generating Galaxy tool templates
 Home-page: http://svn.plone.org/svn/collective/
@@ -11,7 +11,7 @@ Description: Introduction
         
         Writing tool template files for Galaxy can sometimes be extended and error-prone
         process, especially if you're not a programmer or inexperienced in XML and
-        templating systems. *bioscripts.gengtool* is a Python library that packages a
+        templating systems. *bioscripts.galgen* is a Python library that packages a
         script for generating the files that Galaxy requires to wrap a commandline tool
         from a series of interactive questions. For simple tools, these files should be
         complete and ready for use. For more complex tools, they will serve as a useful
@@ -25,7 +25,7 @@ Description: Introduction
         Tool generation overview
         ========================
         
-        The tool generation script is called ``gene-gtool`` and can be called from the
+        The tool generation script is called ``galgen`` and can be called from the
         commandline as such::
         
         % gen-gtool
