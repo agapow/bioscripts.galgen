@@ -1,3 +1,9 @@
+"""
+Reduce a commandline to identifiable components. 
+
+To produce tool templates and 
+
+"""
 
 
 ### IMPORTS

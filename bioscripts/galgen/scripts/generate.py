@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-Interactively generate the supporting files for a Galaxy tool.
-
-"""
+"Interactively generate the supporting files for a Galaxy extension."
 # TODO: all the format crap should be in one table
 
 __docformat__ = 'restructuredtext en'
@@ -13,7 +10,7 @@ __author__ = 'Paul-Michael Agapow <pma@agapow.net>'
 ### IMPORTS ###
 
 from os import path
-from optparse import OptionParser
+from argparse import ArgumentParser
 from exceptions import BaseException
 
 from bioscripts.galgen import __version__
@@ -111,35 +108,44 @@ def ask_generation_details (options):
 
 ### MAIN ###
 
-def parse_args():
-	# Construct the option parser.
-	usage = '%prog [options]'
-	version = "version %s" %  __version__	
-	epilog="""gen-gtool generates the templates supporting fiels for
-		incorporating a commandline program into Galaxy as a tool.""",
-	optparser = OptionParser (usage=usage, version=version, epilog=epilog)
+def parse_main_args (op, args):
+	op.epilog="""The following commands are available:\n* tool: generate files for wrapping a commandline tool for Galaxy""",
+	options, pargs = optparser.parse_args (args)
+	return 'main', options, pargs
 	
-	optparser.add_option ('--tool-name',
+	
+def parse_tool_args (op, args):
+	op.usage = '%s tool [options]' % op.prog
+	op.epilog="""This command generates the necessary supporting files for
+		wrappping a commandline and incorporating it into Galaxy. In more detail,
+		given an example of program, it deduces the """,
+		
+	
+	
+	
+
+	
+	optparser.add_argument ('--tool-name',
 		dest='tool_name',
 		help='The name for the generated tool',
 		metavar='DIR-NAME',
 	)
 	
-	optparser.add_option ('--tool-conf-entry-name',
+	optparser.add_argument ('--tool-conf-entry-name',
 		dest='tool-conf-name',
 		help='The name for the generated tool-conf.xml file entry',
 		metavar='FILE-NAME',
 		default='%(tool_name)s-tool-conf-entry.xml'
 	)
 		
-	optparser.add_option ('--tool-dir-name',
+	optparser.add_argument ('--tool-dir-name',
 		dest='tool_dir_name',
 		help='The name for the generated tool directory',
 		metavar='DIR-NAME',
 		default='%(tool_name)s'
 	)
 	
-	optparser.add_option ('--dryrun',
+	optparser.add_argument ('--dryrun',
 		 dest='dryrun',
 		 help='Test user input but do not actually generate files.'
 		 action='store_true',
@@ -152,6 +158,30 @@ def parse_args():
 	if (0 <= len (pargs)):
 		optparser.error ('unrecognised trailing arguments')
 	return out_fmt, infiles, options
+		
+		
+		
+	options, pargs = optparser.parse_args (args)
+	return 'main', options, pargs
+	
+	
+def parse_args():
+	# Construct the general option parser.
+	usage = '%(prog)s COMMAND [options]'
+	version = 'version %s' %  __version__
+	desc = 'Generates templates and files for Galaxy extensions.'
+	op = ArgumentParser (usage=usage, version=version, prog=prog, description=desc)
+
+	
+	# if you have a command
+	if (0 < len(args)):
+		cmd = args[0].lower()
+		if cmd == 'tool':
+			return parse_tool_args (op, args[1:])
+			
+	# Return:
+	return op.parse_args()
+
 
 
 def main():
