@@ -281,7 +281,7 @@ def ask_long_choice (question, choices, help=None, default=None):
 def ask_string (question, converters=[], help=None, hints=None, default=None,
 		strip_flanking_space=True, allow_blank=False):
 	return ask (question, converters=converters+[Nonblank()], help=help,
-		hints=hints, default=default, strip_flanking_space=True):
+		hints=hints, default=default, strip_flanking_space=True)
 
 
 class Choice (object):

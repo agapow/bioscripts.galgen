@@ -73,9 +73,10 @@ TEST_CMDLINES = [
 def make_argument_token (val):
 	return val
 
+param = Word(alphanums + '-_.')
 
 option = Or ([
-	Word(letters, min=1, max=1),
+	Word(alphas, min=1, max=1),
 	Combine (Literal('-') + Word(alphanums + '-_')),
 	Combine (Literal('--') + Word(alphanums + '-_')),
 ]).setParseAction (
@@ -87,11 +88,7 @@ option_list = ZeroOrMore (option).setParseAction (
 )
 
 
-trailing_args = ZeroOrMore (Or ([
-		filename,
-		param,
-	])
-).setParseAction (
+trailing_args = ZeroOrMore (param).setParseAction (
 	lambda t: Token ("trailing_args", t.asList())
 )
 

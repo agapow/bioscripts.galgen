@@ -12,6 +12,7 @@ __author__ = 'Paul-Michael Agapow <pma@agapow.net>'
 from os import path
 from argparse import ArgumentParser
 from exceptions import BaseException
+import re
 
 from bioscripts.galgen import __version__
 from bioscripts.galgen import ui
@@ -19,7 +20,7 @@ from bioscripts.galgen import ui
 
 ### CONSTANTS & DEFINES ###
 
-MAKEID_RE = re.compile (r'[\s_-\\\/]+')
+MAKEID_RE = re.compile (r'[\s_\-\\\/]+')
 
 _DEV_MODE = True
 
@@ -32,8 +33,10 @@ def print_section (section_title):
 	print ("\n%s\n" % section_title)
 
 
+# Convert names to a form suitable for ids.
+#
 def make_id (name):
-	return MAKEID_RE.sub ('_', name)
+	return MAKEID_RE.sub ('_', name).lower()
 
 
 
@@ -46,14 +49,14 @@ def generate_tool_files (options):
 	
 
 def ask_tool_information (options):
-	print_section ("Tool details"):
+	print_section ("Tool details")
 	options.tool_name = ask_string ("What is the tool name",
 		help="""The tool must have a name, which will be publically visible and
 			appears on the tool menu and form."""
 	)
 	options.tool_version = ask_string ("What is the tool version",
 		help="""The tool may have a version number, which is only important for
-			tool updates."""
+			tool updates.""",
 		default="0.1",
 	)
 	options.tool_id = ask_string ("What is the tool's id",
@@ -72,7 +75,7 @@ def ask_tool_information (options):
 	
 	
 def ask_commandline_form (options):
-	print_section ("Commandline details"):
+	print_section ("Commandline details")
 	options.tool_help = ask_string ("What is the form of the command-line",
 		help="""How is the wrapped commandline executable called? Choose one of
 			the below options, or manually enter one, using either the abstract
@@ -95,90 +98,62 @@ def ask_generation_details (options):
 			inside the tool directory) or external (i.e. present elsewhere on the
 			system)""",
 	)
-	ask_string ("Name the tool-conf.xml entry fragment",
-		default=
-	)
-	ask_string ("Name the tool folder",
-		default=
-	)
-	ask_string ("Name the config file",
-		default=
-	)
+	#ask_string ("Name the tool-conf.xml entry fragment",
+	#	default=
+	#)
+	#ask_string ("Name the tool folder",
+	#	default=
+	#)
+	#ask_string ("Name the config file",
+	#	default=
+	#)
 
 
 ### MAIN ###
 
-def parse_main_args (op, args):
-	op.epilog="""The following commands are available:\n* tool: generate files for wrapping a commandline tool for Galaxy""",
-	options, pargs = optparser.parse_args (args)
-	return 'main', options, pargs
-	
-	
-def parse_tool_args (op, args):
-	op.usage = '%s tool [options]' % op.prog
-	op.epilog="""This command generates the necessary supporting files for
-		wrappping a commandline and incorporating it into Galaxy. In more detail,
-		given an example of program, it deduces the """,
-		
-	
-	
-	
+def parse_args():
+	# Construct the general option parser.
+	op = ArgumentParser (description='Generates templates and files for Galaxy extensions.')
+	op.add_argument('--version', action='version', version=__version__)
 
+	# command subparsers
+	sb = op.add_subparsers (help="generation command")
 	
-	optparser.add_argument ('--tool-name',
+	# tool command options
+	tool_ap = sb.add_parser ('tool', help="""This command generates the supporting
+		files for wrappping a commandline and incorporating it into Galaxy. In
+		more detail, given an example of how a program is called, it deduces
+		the necessary inputs and outputs, checks these with the user and generates
+		the toolconf.xml entry, the tool directory and template.""",
+	)
+	
+	tool_ap.add_argument ('--name',
 		dest='tool_name',
 		help='The name for the generated tool',
 		metavar='DIR-NAME',
 	)
 	
-	optparser.add_argument ('--tool-conf-entry-name',
+	tool_ap.add_argument ('--conf-entry-file-name', 
 		dest='tool-conf-name',
 		help='The name for the generated tool-conf.xml file entry',
 		metavar='FILE-NAME',
 		default='%(tool_name)s-tool-conf-entry.xml'
 	)
 		
-	optparser.add_argument ('--tool-dir-name',
+	tool_ap.add_argument ('--dir-name',
 		dest='tool_dir_name',
 		help='The name for the generated tool directory',
 		metavar='DIR-NAME',
 		default='%(tool_name)s'
 	)
 	
-	optparser.add_argument ('--dryrun',
-		 dest='dryrun',
-		 help='Test user input but do not actually generate files.'
-		 action='store_true',
+	tool_ap.add_argument ('--dryrun',
+		dest='dryrun',
+		help='Test user input but do not actually generate files.',
+		action='store_true',
 	)
-	
-	# XXX: don't actually use input files, may at some point in future
-	options, pargs = optparser.parse_args()
-	
-	## Postconditions & return:
-	if (0 <= len (pargs)):
-		optparser.error ('unrecognised trailing arguments')
-	return out_fmt, infiles, options
-		
-		
-		
-	options, pargs = optparser.parse_args (args)
-	return 'main', options, pargs
-	
-	
-def parse_args():
-	# Construct the general option parser.
-	usage = '%(prog)s COMMAND [options]'
-	version = 'version %s' %  __version__
-	desc = 'Generates templates and files for Galaxy extensions.'
-	op = ArgumentParser (usage=usage, version=version, prog=prog, description=desc)
 
 	
-	# if you have a command
-	if (0 < len(args)):
-		cmd = args[0].lower()
-		if cmd == 'tool':
-			return parse_tool_args (op, args[1:])
-			
 	# Return:
 	return op.parse_args()
 
